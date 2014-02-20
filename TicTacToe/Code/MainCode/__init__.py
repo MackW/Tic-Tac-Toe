@@ -13,7 +13,6 @@ class TTTMain:
     """ Defaulting to X"""
     def __init__(self, width=640,height=480):
         """Initialize"""
-        """Initialize PyGame"""
         pygame.init()
         """Set the window Size"""
         self.width = width
