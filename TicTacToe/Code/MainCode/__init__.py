@@ -22,10 +22,34 @@ class PyManMain:
         
     def MainLoop(self):
         """This is the Main Loop of the Game"""
+        pygame.key.set_repeat(500, 30)
+        
+        """Create the background"""
+        self.background = pygame.Surface(self.screen.get_size())
+        self.background = self.background.convert()
+        self.background.fill((0,0,0))
         while 1:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: 
                     sys.exit()
+                elif event.type == KEYDOWN:
+                    if ((event.key == K_1)
+                        or (event.key == K_LEFT)
+                        or (event.key == K_UP)
+                        or (event.key == K_DOWN)):
+                            self.KeyPressed(event.key)
+                            
+            pygame.display.flip()
+                            
+    def KeyPressed(self,key):
+        font = pygame.font.Font(None, 36)
+        text = font.render("X", 1, (255, 0, 0))
+        if (key == K_1):
+            textpos = text.get_rect(centerx=self.width/2,centery=self.height/2)
+        elif (key == K_2):   
+            textpos = text.get_rect(centerx=self.width/2)
+        self.screen.blit(text, textpos)      
+                    
 if __name__ == "__main__":
     MainWindow = PyManMain()
     MainWindow.MainLoop()
