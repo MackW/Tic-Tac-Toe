@@ -9,7 +9,7 @@ class TTTMain:
     """The Main Tic-Tac-Toe Class - This class handles the main 
     initialization and creating of the Game."""
     Board =[0,0,0,0,0,0,0,0,0]
-    Playing = 1 
+    Playing = 2
     """ Defaulting to X"""
     def __init__(self, width=640,height=480):
         """Initialize"""
@@ -39,7 +39,7 @@ class TTTMain:
                         if self.CheckForWin() ==0:
                             self.PlayComputerMove()
                         if self.CheckForWin()>0:                             
-                            msg="You Win" if self.CheckForWin()==1 else "It's A Draw" if self.CheckForWin()==3 else "I Win"   
+                            msg="You Win" if self.CheckForWin()==self.Playing else "It's A Draw" if self.CheckForWin()==3 else "I Win"   
                             font = pygame.font.Font(None, 72)                                                                                        
                             text = font.render(msg, 1, (0, 255, 0))                               
                             textpos = text.get_rect(centerx=self.width/2,centery=self.height/2)
