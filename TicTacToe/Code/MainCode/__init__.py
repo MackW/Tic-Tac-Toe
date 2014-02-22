@@ -9,7 +9,7 @@ class TTTMain:
     """The Main Tic-Tac-Toe Class - This class handles the main 
     initialization and creating of the Game."""
     Board =[0,0,0,0,0,0,0,0,0]
-    Playing = 2
+    Playing = "X"
     """ Defaulting to X"""
     def __init__(self, width=640,height=480):
         """Initialize"""
@@ -26,10 +26,38 @@ class TTTMain:
         pygame.key.set_repeat(500, 30)
         
         """Create the background"""
-        self.background = pygame.Surface(self.screen.get_size())
-        self.background = self.background.convert()
-        self.background.fill((0,0,0))
+
+        self.screen.fill((0,0,0))
         self.DrawBoard(self.screen)
+        for x in xrange(0, 9):
+            self.DrawPosition(x, str(x+1), (64, 64, 64),0)
+           
+        while 1:     
+            self.PlayGame()
+            self.WaitForKeyAndResetGame()
+
+    def WaitForKeyAndResetGame(self):
+        exitloop = 0
+        font = pygame.font.Font(None, 72)                                                                                        
+        text = font.render("Press Any Key", 1, (0, 255, 0))                               
+        textpos = text.get_rect(centerx=self.width/2,centery=self.height/2+100)
+        self.screen.blit(text, textpos) 
+        pygame.display.flip()
+        while exitloop == 0:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: 
+                    sys.exit()
+                elif event.type == KEYDOWN:
+                    exitloop=1
+        self.screen.fill((0,0,0))   
+        self.DrawBoard(self.screen)
+        for x in xrange(0, 9):
+            self.DrawPosition(x, str(x+1), (64, 64, 64),0)   
+        self.Board =[0,0,0,0,0,0,0,0,0]
+        pygame.display.flip()
+        
+    def PlayGame(self):
+        exitloop = 0
         while 1:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: 
@@ -39,12 +67,15 @@ class TTTMain:
                         if self.CheckForWin() ==0:
                             self.PlayComputerMove()
                         if self.CheckForWin()>0:                             
-                            msg="You Win" if self.CheckForWin()==self.Playing else "It's A Draw" if self.CheckForWin()==3 else "I Win"   
+                            msg="You Win" if self.CheckForWin()==self.Playing else "It's A Draw" if self.CheckForWin()==3 else "I Win"    
                             font = pygame.font.Font(None, 72)                                                                                        
                             text = font.render(msg, 1, (0, 255, 0))                               
                             textpos = text.get_rect(centerx=self.width/2,centery=self.height/2)
-                            self.screen.blit(text, textpos)                  
-            pygame.display.flip()
+                            self.screen.blit(text, textpos)  
+                            exitloop=1                
+                pygame.display.flip()
+            if exitloop==1:
+                break
             
     def DrawBoard(self,screen):
         pygame.draw.lines(screen, (255, 255, 255), False, [(238,80), (238,420)], 4)
@@ -55,28 +86,34 @@ class TTTMain:
     def KeyPressed(self,key):
         ValidMove=0
         if (key == K_1) and (self.Board[0]==0):
-            ValidMove=self.DrawPosition(0, self.Playing)
+            ValidMove=self.MakeMove(0,self.Playing)
         elif (key == K_2)and (self.Board[1]==0):
-            ValidMove=self.DrawPosition(1, self.Playing)
+            ValidMove=self.MakeMove(1,self.Playing)
         elif (key == K_3)and (self.Board[2]==0):
-            ValidMove=self.DrawPosition(2, self.Playing)
+            ValidMove=self.MakeMove(2,self.Playing)
         elif (key == K_4)and (self.Board[3]==0):
-            ValidMove=self.DrawPosition(3, self.Playing)
+            ValidMove=self.MakeMove(3,self.Playing)
         elif (key == K_5)and (self.Board[4]==0):
-            ValidMove=self.DrawPosition(4, self.Playing)
+            ValidMove=self.MakeMove(4,self.Playing)
         elif (key == K_6)and (self.Board[5]==0):
-            ValidMove=self.DrawPosition(5, self.Playing)
+            ValidMove=self.MakeMove(5,self.Playing)
         elif (key == K_7)and (self.Board[6]==0): 
-            ValidMove=self.DrawPosition(6, self.Playing)                     
+            ValidMove=self.MakeMove(6,self.Playing)                
         elif (key == K_8)and (self.Board[7]==0):
-            ValidMove=self.DrawPosition(7, self.Playing)
+            ValidMove=self.MakeMove(7,self.Playing)
         elif (key == K_9)and (self.Board[8]==0):
-            ValidMove=self.DrawPosition(8, self.Playing)
+            ValidMove=self.MakeMove(8,self.Playing)
         return ValidMove         
-    
-    def DrawPosition(self,position,piece):
+    def MakeMove(self,position,piece):
+        self.DrawPosition(position, str(position+1), (0, 0, 0),0)
+        self.DrawPosition(position, piece, (255, 0, 0),1)
+        self.Board[position]=piece
+        self.ValidMove=1
+        return 1
+        
+    def DrawPosition(self,position,piece,colour,ismove):
         font = pygame.font.Font(None, 36)
-        text = font.render("X" if piece==1 else "O", 1, (255, 0, 0))
+        text = font.render(piece, 1,colour)
         if (position==0):
             textpos = text.get_rect(centerx=160,centery=120)      
         elif (position==1):
@@ -95,10 +132,7 @@ class TTTMain:
             textpos = text.get_rect(centerx=320,centery=360)
         elif (position==8):
             textpos = text.get_rect(centerx=480,centery=360)
-        self.ValidMove=1
-        self.Board[position]=piece
         self.screen.blit(text, textpos)  
-        return 1
         
     def CheckForWin(self):
         win =0
@@ -129,8 +163,8 @@ class TTTMain:
                               or self.Board[5]==0 or self.Board[6]==0 or self.Board[7]==0 or self.Board[8]==0):
             pos = random.choice([0, 1, 2, 3, 4, 5, 6, 7, 8])
             if self.Board[pos]==0:
-                self.Board[pos]=1 if self.Playing==1 else 2
-                playedMove =self.DrawPosition(pos, 1 if self.Playing==2 else 2)
+                self.Board[pos]="X" if self.Playing=="O" else "O"
+                playedMove =self.MakeMove(pos, self.Board[pos])
         return playedMove    
                     
 if __name__ == "__main__":
