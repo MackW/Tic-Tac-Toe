@@ -223,7 +223,7 @@ class TTTMain:
             if pos==-1: pos=self.CheckForLine(0, 4, 8,imPlaying)  
             if pos==-1: pos=self.CheckForLine(2, 4, 6,imPlaying)       
             if pos==-1: pos=self.CheckForLine(0, 3, 6,imPlaying)
-            if pos==-1: pos=self.CheckForLine(1, 4, 6,imPlaying)
+            if pos==-1: pos=self.CheckForLine(1, 4, 7,imPlaying)
             if pos==-1: pos=self.CheckForLine(2, 5, 8,imPlaying)  
             if pos==-1: pos=self.CheckForLine(0, 1, 2,self.Playing)
             if pos==-1: pos=self.CheckForLine(3, 4, 5,self.Playing)
@@ -231,10 +231,9 @@ class TTTMain:
             if pos==-1: pos=self.CheckForLine(0, 4, 8,self.Playing)  
             if pos==-1: pos=self.CheckForLine(2, 4, 6,self.Playing) 
             if pos==-1: pos=self.CheckForLine(0, 3, 6,self.Playing)
-            if pos==-1: pos=self.CheckForLine(1, 4, 6,self.Playing)
+            if pos==-1: pos=self.CheckForLine(1, 4, 7,self.Playing)
             if pos==-1: pos=self.CheckForLine(2, 5, 8,self.Playing)
-            if pos==-1:         
-                pos = random.choice([0, 1, 2, 3, 4, 5, 6, 7, 8])
+            if pos==-1: pos = random.choice([0, 1, 2, 3, 4, 5, 6, 7, 8])
             if self.Board[pos]==0:
                 self.Board[pos]=imPlaying
                 playedMove =self.MakeMove(pos, self.Board[pos])
