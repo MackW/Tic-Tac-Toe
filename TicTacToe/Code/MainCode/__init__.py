@@ -10,6 +10,8 @@ class TTTMain:
     initialization and creating of the Game."""
     Board =[0,0,0,0,0,0,0,0,0]
     Playing = "X"
+    level=1
+    whoStarts="X"
     """ Defaulting to X"""
     def __init__(self, width=640,height=480):
         """Initialize"""
@@ -25,14 +27,13 @@ class TTTMain:
         """This is the Main Loop of the Game"""
         pygame.key.set_repeat(500, 30)
         
-        """Create the background"""
-
         self.screen.fill((0,0,0))
         self.DrawBoard(self.screen)
         for x in xrange(0, 9):
             self.DrawPosition(x, str(x+1), (64, 64, 64),0)
            
-        while 1:     
+        while 1:
+            self.IntroScreen()     
             self.PlayGame()
             self.WaitForKeyAndResetGame()
 
@@ -40,7 +41,7 @@ class TTTMain:
         exitloop = 0
         font = pygame.font.Font(None, 72)                                                                                        
         text = font.render("Press Any Key", 1, (0, 255, 0))                               
-        textpos = text.get_rect(centerx=self.width/2,centery=self.height/2+100)
+        textpos = text.get_rect(centerx=self.width/2,centery=278)
         self.screen.blit(text, textpos) 
         pygame.display.flip()
         while exitloop == 0:
@@ -49,15 +50,59 @@ class TTTMain:
                     sys.exit()
                 elif event.type == KEYDOWN:
                     exitloop=1
-        self.screen.fill((0,0,0))   
+                               
+    def IntroScreen(self):
+        exitloop = 0
+        self.UpdateIntroText()
+        while exitloop == 0:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: 
+                    sys.exit()
+                elif event.type == KEYDOWN:
+                    if event.key==K_1:
+                        self.whoStarts="X"
+                        self.UpdateIntroText()
+                    elif event.key==K_2:
+                        self.whoStarts="O"
+                        self.UpdateIntroText()                        
+                    elif event.key==K_x:
+                        self.Playing="X"
+                        self.UpdateIntroText()                    
+                    elif event.key==K_o:
+                        self.Playing="O"
+                        self.UpdateIntroText()                    
+                    elif event.key==K_SPACE:
+                        exitloop=1       
+        self.screen.fill((0,0,0)) 
+        pygame.display.flip()
         self.DrawBoard(self.screen)
         for x in xrange(0, 9):
             self.DrawPosition(x, str(x+1), (64, 64, 64),0)   
         self.Board =[0,0,0,0,0,0,0,0,0]
+        font = pygame.font.Font(None, 36)                                                                                        
+        text = font.render("You Are Playing : "+ self.Playing, 1, (0, 255, 0))                               
+        textpos = text.get_rect(centerx=self.width/2,centery=440)
+        self.screen.blit(text, textpos) 
         pygame.display.flip()
-        
+     
+    def UpdateIntroText(self):    
+        self.screen.fill((0,0,0)) 
+        pygame.display.flip() 
+        font = pygame.font.Font(None, 48)    
+        text = font.render("Playing (X or O to change) : " + self.Playing, 1, (0, 255, 0))                               
+        textpos = text.get_rect(centerx=self.width/2,centery=80)
+        self.screen.blit(text, textpos) 
+        text = font.render("Who Starts (1 or 2 to change) : " + self.whoStarts, 1, (0, 255, 0))                               
+        textpos = text.get_rect(centerx=self.width/2,centery=160)
+        self.screen.blit(text, textpos)                                                                                     
+        text = font.render("Press Space to Start", 1, (0, 255, 0))                               
+        textpos = text.get_rect(centerx=self.width/2,centery=self.height/2)
+        self.screen.blit(text, textpos) 
+        pygame.display.flip()
     def PlayGame(self):
         exitloop = 0
+        if self.Playing!=self.whoStarts:
+            self.PlayComputerMove()
         while 1:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: 
@@ -70,7 +115,7 @@ class TTTMain:
                             msg="You Win" if self.CheckForWin()==self.Playing else "It's A Draw" if self.CheckForWin()==3 else "I Win"    
                             font = pygame.font.Font(None, 72)                                                                                        
                             text = font.render(msg, 1, (0, 255, 0))                               
-                            textpos = text.get_rect(centerx=self.width/2,centery=self.height/2)
+                            textpos = text.get_rect(centerx=self.width/2,centery=158)
                             self.screen.blit(text, textpos)  
                             exitloop=1                
                 pygame.display.flip()
@@ -156,14 +201,42 @@ class TTTMain:
                               and self.Board[5]>0 and self.Board[6]>0 and self.Board[7]>0 and self.Board[8]>0):
             win=3                                                            
         return win
-    
+    def CheckForLine (self,pos1,pos2,pos3,imPlaying):
+        
+        pos=-1
+        if ((self.Board[pos1]==self.Board[pos2]==imPlaying) and (self.Board[pos3]==0)):
+            pos=pos3
+        elif ((self.Board[pos2]==self.Board[pos3]==imPlaying) and (self.Board[pos1]==0)):
+            pos=pos1
+        elif ((self.Board[pos1]==self.Board[pos3]==imPlaying) and (self.Board[pos2]==0)):
+            pos=pos2    
+        return pos   
     def PlayComputerMove(self):
         playedMove=0
+        imPlaying="X" if self.Playing=="O" else "O"
         while playedMove==0 and (self.Board[0]==0 or self.Board[1]==0 or self.Board[2]==0 or self.Board[3]==0 or self.Board[4]==0 
                               or self.Board[5]==0 or self.Board[6]==0 or self.Board[7]==0 or self.Board[8]==0):
-            pos = random.choice([0, 1, 2, 3, 4, 5, 6, 7, 8])
+            pos=-1
+            pos=self.CheckForLine(0, 1, 2,imPlaying)
+            if pos==-1: pos=self.CheckForLine(3, 4, 5,imPlaying)
+            if pos==-1: pos=self.CheckForLine(6, 7, 8,imPlaying)
+            if pos==-1: pos=self.CheckForLine(0, 4, 8,imPlaying)  
+            if pos==-1: pos=self.CheckForLine(2, 4, 6,imPlaying)       
+            if pos==-1: pos=self.CheckForLine(0, 3, 6,imPlaying)
+            if pos==-1: pos=self.CheckForLine(1, 4, 6,imPlaying)
+            if pos==-1: pos=self.CheckForLine(2, 5, 8,imPlaying)  
+            if pos==-1: pos=self.CheckForLine(0, 1, 2,self.Playing)
+            if pos==-1: pos=self.CheckForLine(3, 4, 5,self.Playing)
+            if pos==-1: pos=self.CheckForLine(6, 7, 8,self.Playing)
+            if pos==-1: pos=self.CheckForLine(0, 4, 8,self.Playing)  
+            if pos==-1: pos=self.CheckForLine(2, 4, 6,self.Playing) 
+            if pos==-1: pos=self.CheckForLine(0, 3, 6,self.Playing)
+            if pos==-1: pos=self.CheckForLine(1, 4, 6,self.Playing)
+            if pos==-1: pos=self.CheckForLine(2, 5, 8,self.Playing)
+            if pos==-1:         
+                pos = random.choice([0, 1, 2, 3, 4, 5, 6, 7, 8])
             if self.Board[pos]==0:
-                self.Board[pos]="X" if self.Playing=="O" else "O"
+                self.Board[pos]=imPlaying
                 playedMove =self.MakeMove(pos, self.Board[pos])
         return playedMove    
                     
